@@ -18,5 +18,6 @@ case "$LARBSWM" in
 		ssh-agent dwm || break
 		done ;;
 	i3) exec i3 ;;
+	bspwm) exec bspwm ;;
 	*) echo "No valid LARBS window manager detected." ;;
 esac

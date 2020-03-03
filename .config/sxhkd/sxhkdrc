@@ -10,29 +10,25 @@
 # Basic binds
 super + Return
 	$TERMINAL
+super + shift + Return
+	thunar
 super + d
 	dmenu_run
 super + r
 	$TERMINAL -e $FILE
 super + e
-	$TERMINAL -e neomutt; pkill -RTMIN+12 $STATUSBAR
-super + m
-	$TERMINAL -e ncmpcpp
-super + n
-	$TERMINAL -e newsboat
+	code
 super + c
 	$TERMINAL -e calcurse -D ~/.config/calcurse
 super + v
 	$TERMINAL -e nvim -c VimwikiIndex
 super + shift + a
 	$TERMINAL -e alsamixer; pkill -RTMIN+10 $STATUSBAR
-super + shift + c
-	mpv --no-osc --no-input-default-bindings --input-conf=/dev/null --title='mpvfloat' /dev/video0
 super + shift + e
 	tutorialvids
-super + w
-	$TERMINAL -e sudo nmtui
 super + shift + w
+	$TERMINAL -e sudo nmtui
+super + w
 	$BROWSER
 
 # Et cetera...
@@ -46,10 +42,12 @@ super + shift + x
 	prompt "Shutdown computer?" "sudo -A shutdown -h now"
 super + shift + BackSpace
 	prompt "Reboot computer?" "sudo -A reboot"
+super + Escape
+	xkill
 super + shift + Escape
 	prompt 'Leave Xorg?' 'killall Xorg'
 super + x
-	ifinstalled slock && ( slock & xset dpms force off ; mpc pause ; pauseallmpv )
+	oblogout
 XF86Launch1
 	xset dpms force off
 XF86TouchpadToggle
@@ -60,6 +58,87 @@ XF86MonBrightnessDown
 	xbacklight -dec 15
 XF86MonBrightnessUp
 	xbacklight -inc 15
+
+
+#################################################################
+# ALT + ... KEYS
+#################################################################
+
+#Wallpaper trash
+alt + t
+    variety -t
+
+#Wallpaper next
+alt + n
+    variety -n
+
+#Wallpaper previous
+alt + p
+    variety -p
+
+#Wallpaper favorite
+alt + f
+    variety -f
+
+#Wallpaper previous
+alt + Left
+    variety -p
+
+#Wallpaper next
+alt + Right
+    variety -n
+
+#Wallpaper toggle-pause
+alt + Up
+    variety --toggle-pause
+
+#Wallpaper resume
+alt + Down
+    variety --resume
+
+#Gmrun
+alt + F2
+    gmrun
+
+#Xfce4-appfinder
+alt + F3
+    xfce4-appfinder
+
+
+#################################################################
+#VARIETY KEYS WITH PYWAL
+#################################################################
+
+#Wallpaper trash
+alt + shift + t
+    variety -t && wal -i $(cat $HOME/.config/variety/wallpaper/wallpaper.jpg.txt)&
+
+#Wallpaper next
+alt + shift + n
+    variety -n && wal -i $(cat $HOME/.config/variety/wallpaper/wallpaper.jpg.txt)&
+
+#Wallpaper previous
+alt + shift + p
+    variety -p && wal -i $(cat $HOME/.config/variety/wallpaper/wallpaper.jpg.txt)&
+
+#Wallpaper favorite
+alt + shift + f
+    variety -f && wal -i $(cat $HOME/.config/variety/wallpaper/wallpaper.jpg.txt)&
+
+#Wallpaper update
+alt + shift + u
+    wal -i $(cat $HOME/.config/variety/wallpaper/wallpaper.jpg.txt)&
+
+
+#################################################################
+# CONTROL + SHIFT KEYS
+#################################################################
+
+#Xcfe4-TaskManager
+ctrl + shift + Escape
+    xfce4-taskmanager
+
+
 
 # Recording
 # Take screenshot
@@ -102,15 +181,17 @@ super + shift + m
 
 # Audiokeys
 XF86AudioMute
-	amixer sset Master toggle; pkill -RTMIN+10 $STATUSBAR
+	amixer sset Master toggle
+#amixer -D pulse set Master 1+ toggle
 XF86Audio{Raise,Lower}Volume
-	amixer sset Master 5%{+,-}; pkill -RTMIN+10 $STATUSBAR
-XF86Audio{Next,Prev}
-	mpc {next,prev}
-XF86Audio{Pause,Play,Stop}
-	mpc {pause,play,stop}
-XF86Audio{Rewind,Forward}
-	mpc seek {-,+}10
+	amixer sset Master 5%{+,-}
+#amixer set Master 10%{+,-}
+# XF86Audio{Next,Prev}
+# mpc {next,prev}
+# XF86Audio{Pause,Play,Stop}
+# mpc {pause,play,stop}
+# XF86Audio{Rewind,Forward}
+# mpc seek {-,+}10
 XF86AudioRecord
 	dmenurecord
 XF86AudioMedia
@@ -134,6 +215,21 @@ XF86Mail
 	$TERMINAL -e neomutt
 XF86MyComputer
 	$TERMINAL -e $FILE /
+#Brightness up
+XF86MonBrightnessUp
+    xbacklight -inc 10
+
+#Brightness down
+XF86MonBrightnessDown
+    xbacklight -dec 10
+
+#########################
+#        POLYBAR        #
+#########################
+
+#Hide polybar
+super + y
+    polybar-msg cmd toggle
 
 # Function keys
 super + shift + F1
@@ -156,8 +252,8 @@ super + F6
 super + F7
 	td-toggle
 # sync email
-super + F8
-	mailsync
+#super + F8
+#	mailsync
 # Mount a USB drive or Android device
 super + {F9,F10}
 	{dmenumount,dmenuumount}
@@ -180,16 +276,24 @@ super + y
 super + space
 	bspc node -s biggest.local || bspc node -s next.local
 
+#Rotate desktop
+alt + space
+	bspc node @/ --rotate {90,-90}
+
 #
 # state/flags
 #
 
 # set the window state
-#super + {t,shift + t,s}
-#bspc node -t {tiled,pseudo_tiled,floating}
+super + {t,shift + t,s}
+	bspc node -t {tiled,pseudo_tiled,floating}
 
 super + shift + space
 	bspc node focused -t \~floating
+
+# Move focus to other monitor
+super + BackSpace
+		bspc monitor -f next
 
 # focus/swap
 
@@ -221,6 +325,10 @@ super + {_,shift + }{1-9,0}
 # preselect the direction
 #super + {u,o}
 #bspc node -p {south,east}
+
+# Preselect the splitting area for next window on leaf/parent
+super + ctrl + {u,i,o,p}
+	bspc node --presel-dir \~{west,south,north,east}
 
 # preselect the ratio
 super + ctrl + {1-9}
