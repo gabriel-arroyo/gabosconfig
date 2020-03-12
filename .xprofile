@@ -20,7 +20,7 @@ $HOME/.config/polybar/launch.sh &
 setxkbmap latam
 
 xsetroot -cursor_name left_ptr &
-#run sxhkd -c ~/.config/sxhkd/sxhkdrc &
+run sxhkd -c ~/.config/sxhkd/sxhkdrc &
 
 run variety &
 run nm-applet &
